@@ -1,8 +1,8 @@
 # DesafioWoop.GestaoSeguranca
-* **Este projeto tem como finalidade o teste que foi designado pela Woopi, sendo:
+* Este projeto tem como finalidade o teste que foi designado pela Woopi, sendo:
 
 ## Autor
-* **Vinícius Medeiros - vini.dmedeiros@gmail.com
+* Vinícius Medeiros - vini.dmedeiros@gmail.com
 
 ### Cenário:
 
