@@ -48,6 +48,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IQuestionarioUsuarioRepository, QuestionarioUsuarioRepository>();
+builder.Services.AddScoped<IUserLoginRepository, UserLoginRepository>();
 
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 

@@ -16,6 +16,7 @@ COPY . .
 WORKDIR "/src/DesafioWoop.GestaoSeguranca.API"
 RUN dotnet build "DesafioWoop.GestaoSeguranca.API.csproj" -c Release -o /app/build
 
+
 FROM build AS publish
 RUN dotnet publish "DesafioWoop.GestaoSeguranca.API.csproj" -c Release -o /app/publish
 

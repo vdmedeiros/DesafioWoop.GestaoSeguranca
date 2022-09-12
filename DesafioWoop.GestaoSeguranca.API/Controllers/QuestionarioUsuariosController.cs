@@ -27,7 +27,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<QuestionarioUsuariosController> _log;
 
-        public QuestionarioUsuariosController(IConfiguration config, 
+        public QuestionarioUsuariosController(IConfiguration config,
                                               IQuestionarioUsuarioRepository questionarioUsuarioRepository,
                                               IUserLoginRepository userLoginRepository,
                                               IOptions<AppSettings> appSettings,
@@ -67,7 +67,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
         }
 
         [HttpPost("salvarQuestionarioUsuario")]
-        [ProducesResponseType(StatusCodes.Status200OK)]        
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SalvarQuestionarioUsuario([FromBody] QuestionarioUsuarioRequest questionarioUsuarioRequest)
@@ -79,7 +79,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
 
                 var commandResult = await _mediator.Send(commandQuestionario);
 
-                if(!commandResult.Success)
+                if (!commandResult.Success)
                 {
                     return BadRequest(commandResult.Mensagem);
                     _log.LogInformation("{BadRequest}", JsonSerializer.Serialize(questionarioUsuarioRequest));
@@ -98,15 +98,16 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
             _log.LogInformation("{Log - Delete}", JsonSerializer.Serialize(id));
 
             var questionarioUsuario = _questionarioUsuarioRepository.GetById(id);
-            if (questionarioUsuario != null)
+
+            if (questionarioUsuario == null)
             {
-                _questionarioUsuarioRepository.Delete(questionarioUsuario);
-                return Ok();
+                _log.LogInformation("{NotFound}", JsonSerializer.Serialize(id));
+                return NotFound();
             }
 
-            _log.LogInformation("{NotFound}", JsonSerializer.Serialize(id));
-            return NotFound();
-            
+            _questionarioUsuarioRepository.Delete(questionarioUsuario);
+            return Ok();
+
         }
 
         [HttpPost("checkarRespostas")]
@@ -126,7 +127,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
                     return BadRequest("Não tem registro de Questionário para este usuário");
                     _log.LogInformation("{BadRequest}", JsonSerializer.Serialize(respostaUsuarioRequest));
                 }
-                    
+
                 foreach (var respostaRequest in respostaUsuarioRequest.RespostasUsuario)
                 {
                     var respostaBD = questionarioUsuarioBD.FirstOrDefault(q => ValidaResposta(q, respostaRequest));
@@ -145,12 +146,12 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
         public async Task<IActionResult> Login(UserLoginEnter _userLogin)
         {
             if (ModelState.IsValid)
-            {             
+            {
                 var user = await _userLoginRepository.GetUser(_userLogin.Email, _userLogin.Senha);
 
                 if (user != null)
                 {
-                    return Ok(new { AccessToken = GerarJwt(user) } );
+                    return Ok(new { AccessToken = GerarJwt(user) });
                 }
                 else
                 {
@@ -179,7 +180,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
                 _log.LogInformation("{BadRequest}", JsonSerializer.Serialize(userLogin));
                 return BadRequest();
             }
-        }        
+        }
 
         private string GerarJwt(UserLogin user)
         {

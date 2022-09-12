@@ -60,7 +60,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Commands
 
             ///Caso queira limitar uma quantidade de questões
             RuleFor(x => x.Questionarios)
-                .Must(x => x.Count <= 10).WithMessage(QuantidadeQuestoesPermitida);
+                .Must(x => x.Count <= 2).WithMessage(QuantidadeQuestoesPermitida);
         }
     }
 }
