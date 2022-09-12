@@ -41,7 +41,9 @@ Não é necessário criar o front-end. (Caso queira é um Opcional)
 * Mediator
 * Repository
 
-#### Obs.: Alterar o caminho do BD nas configurações
+#### Observações: 
+* Para obter o token - jwt, é necessário cadastrar um usuário ou logar
+* Alterar o caminho do BD nas configurações
 
 #### Docker
   * docker-compose up
