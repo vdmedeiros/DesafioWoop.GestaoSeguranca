@@ -41,7 +41,7 @@ Não é necessário criar o front-end. (Caso queira é um Opcional)
 * Mediator
 * Repository
 
-### Obs.: Alterar o caminho do BD para algum ambiente
+#### Obs.: Alterar o caminho do BD nas configurações
 
 #### Docker
   * docker-compose up
