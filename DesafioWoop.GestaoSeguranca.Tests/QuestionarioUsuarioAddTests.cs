@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Net;
 
 namespace DesafioWoop.GestaoSeguranca.Tests
 {    
@@ -44,15 +45,36 @@ namespace DesafioWoop.GestaoSeguranca.Tests
             _userLoginService = new Mock<IUserLoginService>();
         }
 
-        [Fact(DisplayName = "Salvar Questionário com sucesso")]
+        [Fact(DisplayName = "Salvar Questionário - Mediator")]
         [Trait("Questionário Usuário", "Salvar - Mediator Command Handler")]
-        public async Task Handler_sends_command_when_questionario_no_exists()
+        public async Task Handler_sends_mediator_command_questionario()
+        {
+            // Arrange
+            var questionarioUsuarioRequest = new Fixture().Create<QuestionarioUsuarioRequest>();
+
+            var commandResultFake = new CommandResult(true);
+
+            _mediator.Setup(x => x.Send(It.IsAny<IRequest<CommandResult>>(),
+                            default(System.Threading.CancellationToken))).Returns(Task.FromResult(commandResultFake));
+
+            // Act
+            var controller = new QuestionarioUsuariosController(_config.Object, _questionarioRepository.Object, _questionarioUsuarioQueries.Object, _questionarioService.Object, _userLoginRepository.Object,
+                                                                _appSettings.Object, _mediator.Object, _log.Object, _userLoginService.Object);
+
+            var result = await controller.SalvarQuestionarioUsuario(questionarioUsuarioRequest);
+
+            //Assert
+            Assert.Equal((int)HttpStatusCode.OK, ((StatusCodeResult)result).StatusCode);
+            _mediator.Verify(x => x.Send(It.IsAny<IRequest<CommandResult>>(), default(System.Threading.CancellationToken)), Times.Once);
+
+        }
+
+        [Fact(DisplayName = "Salvar Questionário sem sucesso")]
+        [Trait("Questionário Usuário", "Salvar - Mediator Command Handler No")]
+        public async Task Handler_sends_invalid_command_questionario()
         {
             // Arrange
             var questionarioCommand = new Fixture().Create<QuestionarioUsuarioCommand>();
-            var commandResultFake = new CommandResult(true);
-            _mediator.Setup(x => x.Send(It.IsAny<IRequest<CommandResult>>(),
-                            default(System.Threading.CancellationToken))).Returns(Task.FromResult(commandResultFake));
 
             // Act
             var handler = new QuestionarioUsuarioCommandHandler(_mediator.Object, _questionarioRepository.Object, _config.Object, _userLoginRepository.Object);
@@ -60,58 +82,8 @@ namespace DesafioWoop.GestaoSeguranca.Tests
             var result = await handler.Handle(questionarioCommand, cltToken);
 
             //Assert
-            Assert.NotNull(result);
-            _mediator.Verify(x => x.Send(It.IsAny<IRequest<bool>>(), default(System.Threading.CancellationToken)), Times.Once());
-        }
-
-        [Fact(DisplayName = "Salvar Questionário sem sucesso")]
-        [Trait("Questionário Usuário", "Salvar - Mediator Command Handler No")]
-        public async Task Handler_sends_no_command_when_questionario_exists()
-        {
-            // Arrange
-            var questionarioUsuarioRequest = new Fixture().Create<QuestionarioUsuarioRequest>();
-
-            var commandResultFake = new CommandResult(false);
-
-            _mediator.Setup(x => x.Send(It.IsAny<IRequest<CommandResult>>(),
-                            default(System.Threading.CancellationToken))).Returns(Task.FromResult(commandResultFake));
-
-            // Act
-            var controller = new QuestionarioUsuariosController(_config.Object, _questionarioRepository.Object, _questionarioUsuarioQueries.Object, _questionarioService.Object,
-                                                                _userLoginRepository.Object, _appSettings.Object, _mediator.Object, _log.Object, _userLoginService.Object);
-
-            var result = await controller.SalvarQuestionarioUsuario(questionarioUsuarioRequest);
-
-            //Assert
-            Assert.NotNull(result);
-            _mediator.Verify(x => x.Send(It.IsAny<IRequest<CommandResult>>(), default(System.Threading.CancellationToken)), Times.Never());
-        }
-
-        //[Fact(DisplayName = "Remover Questionário com sucesso")]
-        //[Trait("Questionário Usuário", "Remover por Id")]
-        //public async Task QuestionarioUsuario_RemoveQuestionario_NotFound()
-        //{
-        //    var questionarioUsuario = new QuestionarioUsuario()
-        //    {
-        //        Id = 6,
-        //        DataCriacao = DateTime.Now,
-        //        UserId = 8,
-        //        Pergunta = "Teste 123?",
-        //        Resposta = "Resposta 123"
-        //    };
-
-        //    // set up the repository’s Delete call
-        //    _questionarioRepository.Setup(r => r.Delete(It.IsAny<QuestionarioUsuario>()));
-
-        //    // act
-        //    var controller = new QuestionarioUsuariosController(_config.Object, _questionarioRepository.Object, _questionarioUsuarioQueries.Object, _userLoginRepository.Object,
-        //                                                        _appSettings.Object, _mediator.Object, _log.Object);
-
-        //    var result = await controller.RemoverQuestionario(questionarioUsuario.Id);
-
-        //    // assert            
-        //    Assert.IsType<NotFoundResult>(questionarioUsuario);
-
-        //}
+            Assert.False(result.Success);
+            
+        }       
     }
 }
