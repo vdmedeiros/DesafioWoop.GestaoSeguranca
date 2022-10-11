@@ -3,28 +3,37 @@
 
 ### Cenário:
 
-Jorisvaldo tentou logar no sistema Sian até expirar suas três tentativas, e percebeu que havia esquecido sua senha pois seu final de semana foi muito produtivo. Logo clicou no botão de "Resetar Senha", foi solicitado o e-mail do usuário onde após informá-lo (1), clicou em "Prosseguir" e foi exibido uma popup listando (2) todas as perguntas cadastradas para o usuário. Após efetuar o preenchimento das respostas, clicou em "Verificar" submetendo (3) todas as respostas do usuário para análise, caso alguma resposta esteja incorreta será exibido as perguntas incorretas de vermelho. Se todas as respostas respondidas com sucesso, o usuário será redirecionado para tela de mudança de senha. É informado a senha onde Jorisvaldo clica em "Mudar Senha". O sistema faz uma verificação (4) se a nova senha já foi utilizada nas 5 últimas mudanças, e caso tenha sido utilizada será exibido uma mensagem solicitando que informe uma nova senha o qual não corresponda as 5 últimas utilizadas.
+Pedro tentou logar no sistema Sian até expirar suas tres tentativas, e percebeu que havia esquecido sua senha pois seu final de semana foi muito produtivo. Logo clicou no botão de "Resetar Senha", foi solicitado o e-mail do usuário onde após informá-lo (1), clicou em "Prosseguir" e foi exibido uma popup listando (2) todas perguntas cadastradas para o usuário. Após efetuar o preenchimento das respostas, clicou em "Verificar" submetendo (3) todas respostas do usuário para análise, caso alguma resposta esteja incorreta será exibido as perguntas incorretas de vermelho. Se todas respostas respondidas com sucesso, o usuário será redirecionado para tela de mudança de senha. É informado a senha onde Pedro clica em "Mudar Senha". O sistema faz uma verificação (4) se a nova senha corresponde já foi utilizada nas 5 ultimas mudanças, e caso tenha sido utilizada será exibido uma mensagem para nformar uma nova senha não correspondente as 5 ultimas cadastradas.
 
-Observações: O item (1), (2), (3) e (4) correspondem a parte das integrações realizadas pelo sistema Sian.
+> **Obervações**: Os itens (1), (2), (3) e (4) correspondem as integrações realizadas pelo sistema Sian.
+## Projete e implemente as funcionalidades:
+* Gestão (inclusão, alteração, exclusão) de perguntas e respostas de segurança de um usuário.
+* Validar através do o e-mail do usuário se todas respostas são válidas. Se houver inconsistências em qualquer resposta deverá ser retornado todas perguntas.
+* Registrar os dados alterados (para auditoria) diante da gestão de perguntas e respostas do usuário realizadas.
+* Listar todas perguntas e as respostas associadas a um e-mail.
+* Listar todas alterações de perguntas e respostas a um e-mail.
+* Verificar se e-mail existe na base e é válido.
+* Validar através do e-mail se a senha informada corresponde as ultimas 5 senhas já alteradas.
+* (OPCIONAL) Criar o front-end.
+* (OPCIONAL) Criar o desenho arquitetural da solução. 
+* (OPCIONAL) Documentação dos contextos, limites, levantados na análise.
+* (OPCIONAL) Criar logs para auxiliar o desenvolvedor no futuro na resolução de bugs.
 
-Projete e implemente as funcionalidades:
+## Considerações gerais do desafio
+* O(s) projeto(s) devem conter uma documentação swagger clara e bem documentada;
+* O(s) contexto(s) das integrações devem ser analisados e levantados antes da criação das APIs;
+* Verifique a consistências e cobertura das funcionalidades pelos testes unitários;
+* Qualquer funcionalidade (endpoints) deve trabalhar com autenticação por JWT;
+* Se informações forem persistidas, essas devem ser realizada em um banco de dados;
+* Itens marcados com (OPCIONAL) não são obrigatórios, más se fizer será muito bem vindo!!!
+* O(s) projeto(s) devem estar compilando e funcionando;
+* Caso necessário algum passo para executar a aplicação, criar um topico no README informando todos os passos necessários.
 
-Gestão (inclusão, alteração, exclusão) de perguntas e respostas de segurança de um usuário.
-Validar através do o e-mail do usuário se todas as respostas são válidas. Se houver inconsistências em qualquer resposta deverá ser retornado todas as perguntas.
-Track das informações geridas pela gestão de perguntas e respostas do usuário.
-Listar todas as perguntas e as respostas associadas de um e-mail.
-Listar todas as alterações de perguntas e respostas de um e-mail.
-Validar através do o e-mail sua existência.
-Validar através do o e-mail se a senha informada corresponde as últimas 5 senhas já alteradas.
-Considerações gerais do desafio:
-
-Cobertura das funcionalidades por testes unitários deve ser no mínimo de 80%;
-Qualquer funcionalidade deve possuir uma autenticação por JWT;
-A execução do projeto deve ser realizada com uma linha utilizando o docker-compose;
-O banco de dados MongoDb ou SqlServer;
-Uma documentação clara e objetiva é necessária.-
-Os contextos das integrações devem ser levados antes da criação da API.
-Não é necessário criar o front-end. (Caso queira é um Opcional)
+## Entrega
+* O tempo total para entrega desse desafio é de 5 dias. 
+* O prazo se inicia _um dia após o recebimento_ do e-mail contendo o desafio.
+* Para sinalizar a entrega do desafio, basta responder o e-mail que foi enviado com desafio, OU, enviar para o e-mail gabriel.ferri@stefanini.com.
+* Se precisar de mais tempo não exite em perguntar por uma nova data.
 
 ## Autor - Desenvolvedor
 * Vinícius Medeiros - vini.dmedeiros@gmail.com
@@ -36,6 +45,7 @@ Não é necessário criar o front-end. (Caso queira é um Opcional)
 * Swagger UI with Jwt support
 * ILogger
 * Entity Framework - Code First
+* Dapper
 * CQRS
 * Mediator
 * Repository
