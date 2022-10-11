@@ -23,6 +23,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Model
         {
             Email = email;
             Senha = senha;
+            
         }
 
         public void AdicionarQuestionarioUsuario(QuestionarioUsuario questionarioUsuario)

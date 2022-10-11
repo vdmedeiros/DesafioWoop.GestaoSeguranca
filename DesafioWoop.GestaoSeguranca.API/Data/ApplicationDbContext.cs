@@ -9,5 +9,6 @@ namespace DesafioWoop.GestaoSeguranca.API.Data
 
         public virtual DbSet<UserLogin>? UserLogin { get; set; }
         public virtual DbSet<QuestionarioUsuario>? QuestionarioUsuario { get; set; }
+        public virtual DbSet<UserLoginHistory>? UserLoginHistory { get; set; }
     }
 }

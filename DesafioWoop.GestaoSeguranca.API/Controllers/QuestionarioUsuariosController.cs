@@ -12,6 +12,8 @@ using DesafioWoop.GestaoSeguranca.API.Commands;
 using MediatR;
 using System.Text.Json;
 using DesafioWoop.GestaoSeguranca.API.Data.Repository;
+using DesafioWoop.GestaoSeguranca.API.Application.Queries;
+using DesafioWoop.GestaoSeguranca.API.Services;
 
 namespace DesafioWoop.GestaoSeguranca.API.Controllers
 {
@@ -26,13 +28,19 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
         private readonly AppSettings _appSettings;
         private readonly IMediator _mediator;
         private readonly ILogger<QuestionarioUsuariosController> _log;
+        private readonly IQuestionarioUsuarioQueries _questionarioUsuarioQueries;
+        private readonly IQuestionarioService _questionarioService;
+        private readonly IUserLoginService _userLoginService;
 
         public QuestionarioUsuariosController(IConfiguration config,
                                               IQuestionarioUsuarioRepository questionarioUsuarioRepository,
+                                              IQuestionarioUsuarioQueries questionarioUsuarioQueries,
+                                              IQuestionarioService questionarioService,
                                               IUserLoginRepository userLoginRepository,
                                               IOptions<AppSettings> appSettings,
                                               IMediator mediator,
-                                              ILogger<QuestionarioUsuariosController> log)
+                                              ILogger<QuestionarioUsuariosController> log,
+                                              IUserLoginService userLoginService)
         {
             _questionarioUsuarioRepository = questionarioUsuarioRepository;
             _configuration = config;
@@ -40,14 +48,17 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
             _mediator = mediator;
             _log = log;
             _userLoginRepository = userLoginRepository;
+            _questionarioUsuarioQueries = questionarioUsuarioQueries;
+            _questionarioService = questionarioService;
+            _userLoginService = userLoginService;
         }
 
         [HttpGet("getAll")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<QuestionarioUsuario>>> Index()
+        public async Task<IEnumerable<QuestionarioUsuario>> Index()
         {
-            return await Task.FromResult(_questionarioUsuarioRepository.GetAll().ToList());
+            return await Task.FromResult(_questionarioUsuarioQueries.GetAll()).Result;
         }
 
         [HttpGet("{email}")]
@@ -55,7 +66,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<QuestionarioUsuario>>> BuscarPorEmail(string email)
         {
-            var questionarioUsuario = _questionarioUsuarioRepository.GetByEmail(email);
+            var questionarioUsuario = await _questionarioUsuarioQueries.GetByEmail(email);
 
             if (questionarioUsuario == null)
             {
@@ -63,7 +74,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
                 return NotFound();
             }
 
-            return await Task.FromResult(questionarioUsuario);
+            return await Task.FromResult(questionarioUsuario.ToList());
         }
 
         [HttpPost("salvarQuestionarioUsuario")]
@@ -110,36 +121,22 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
 
         }
 
-        [HttpPost("checkarRespostas")]
+        [HttpPost("verificarRespostas")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CheckarRespostas([FromBody] RespostaUsuarioRequest respostaUsuarioRequest)
+        public async Task<IEnumerable<QuestionarioUsuario>> VerificarRespostas([FromBody] RespostaUsuarioRequest respostaUsuarioRequest)
         {
             _log.LogInformation("{Log - CheckAnswers}", JsonSerializer.Serialize(respostaUsuarioRequest));
 
             if (ModelState.IsValid)
             {
-                var questionarioUsuarioBD = _questionarioUsuarioRepository.GetByEmail(respostaUsuarioRequest.Email);
-
-                if (questionarioUsuarioBD == null)
-                {
-                    return BadRequest("Não tem registro de Questionário para este usuário");
-                    _log.LogInformation("{BadRequest}", JsonSerializer.Serialize(respostaUsuarioRequest));
-                }
-
-                foreach (var respostaRequest in respostaUsuarioRequest.RespostasUsuario)
-                {
-                    var respostaBD = questionarioUsuarioBD.FirstOrDefault(q => ValidaResposta(q, respostaRequest));
-                    if (respostaBD == null)
-                    {
-                        return Ok(questionarioUsuarioBD);
-                    }
-                }
-                return Ok();
+                return await Task.FromResult(_questionarioService.ValidaPerguntaResposta(respostaUsuarioRequest)).Result;
             }
-            return BadRequest(ModelState);
+            return Enumerable.Empty<QuestionarioUsuario>();
         }
+
+        
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -182,6 +179,32 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
             }
         }
 
+        [HttpPost("alterarLogin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AlterarSenha(UserLoginRegister userLogin)
+        {
+            if (ModelState.IsValid)
+            {
+                var retorno = await _userLoginService.RealizaAlteracaoSenha(userLogin);
+                if(!retorno)
+                {
+                    var messagemRetorno = string.Format("BadRequest - Senha já utilizada nas últimas {0} vezes", _appSettings.QtdeUltimasSenhas.ToString());
+                    _log.LogInformation(messagemRetorno);
+                    return BadRequest(messagemRetorno);
+                }
+                return Ok();
+            }
+            else
+            {
+                _log.LogInformation("{BadRequest}", JsonSerializer.Serialize(userLogin));
+                return BadRequest();
+            }
+        }
+
+        
+
         private string GerarJwt(UserLogin user)
         {
             var claims = new[] {
@@ -204,11 +227,6 @@ namespace DesafioWoop.GestaoSeguranca.API.Controllers
                 signingCredentials: signIn);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private static bool ValidaResposta(QuestionarioUsuario q, RespostaRequest respostaRequest)
-        {
-            return q.Id == respostaRequest.IdQuestionario && q.Resposta == respostaRequest.Resposta;
-        }
+        }        
     }
 }

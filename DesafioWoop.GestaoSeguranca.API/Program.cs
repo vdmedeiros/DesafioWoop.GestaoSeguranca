@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using MediatR;
 using DesafioWoop.GestaoSeguranca.API.Commands;
 using System.Reflection;
+using DesafioWoop.GestaoSeguranca.API.Application.Queries;
+using DesafioWoop.GestaoSeguranca.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 builder.Services.AddScoped<IQuestionarioUsuarioRepository, QuestionarioUsuarioRepository>();
 builder.Services.AddScoped<IUserLoginRepository, UserLoginRepository>();
+
+builder.Services.AddScoped<IQuestionarioService, QuestionarioService>();
+builder.Services.AddScoped<IUserLoginService, UserLoginService>(); 
+
+builder.Services.AddScoped<IQuestionarioUsuarioQueries>(s => new QuestionarioUsuarioQueries(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 

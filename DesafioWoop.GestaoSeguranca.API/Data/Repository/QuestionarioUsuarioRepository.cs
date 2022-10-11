@@ -27,17 +27,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Data.Repository
         {
             _dbContext.QuestionarioUsuario.Remove(questionarioUsuario);
             _dbContext.SaveChanges();
-        }
-
-        public IEnumerable<QuestionarioUsuario> GetAll()
-        {
-            return _dbContext.QuestionarioUsuario.ToList();
-        }
-
-        public List<QuestionarioUsuario> GetByEmail(string email)
-        {
-            return _dbContext.QuestionarioUsuario.Where(q => q.UserLogin.Email.Equals(email)).ToList();
-        }
+        }       
 
         public QuestionarioUsuario GetById(int id)
         {

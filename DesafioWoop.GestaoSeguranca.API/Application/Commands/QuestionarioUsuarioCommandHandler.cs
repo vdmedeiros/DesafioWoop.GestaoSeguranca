@@ -13,15 +13,15 @@ namespace DesafioWoop.GestaoSeguranca.API.Commands
     {
         private readonly IMediator _mediatorHandler;
         private readonly IQuestionarioUsuarioRepository _questionarioUsuarioRepository;
+        private readonly IUserLoginRepository _userLoginRepository;
         public IConfiguration _configuration;
-        public ApplicationDbContext _dbContext;
 
-        public QuestionarioUsuarioCommandHandler(IMediator mediator, IQuestionarioUsuarioRepository questionarioUsuarioRepository, IConfiguration configuration, ApplicationDbContext dbContext)
+        public QuestionarioUsuarioCommandHandler(IMediator mediator, IQuestionarioUsuarioRepository questionarioUsuarioRepository, IConfiguration configuration, IUserLoginRepository userLoginRepository)
         {
             _mediatorHandler = mediator;
             _questionarioUsuarioRepository = questionarioUsuarioRepository;
             _configuration = configuration;
-            _dbContext = dbContext;
+            _userLoginRepository = userLoginRepository;
         }
 
         public async Task<CommandResult> Handle(QuestionarioUsuarioCommand request, CancellationToken cancellationToken)
@@ -34,7 +34,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Commands
 
                 if (!result.IsValid) return new CommandResult(false, string.Join(Environment.NewLine, result.Errors.Select(e => e.ErrorMessage)));
 
-                var user = await _dbContext.UserLogin.Include("QuestionarioUsuarios").FirstOrDefaultAsync(u => u.Email == request.Email);
+                var user = await _userLoginRepository.GetByEmail(request.Email);
 
                 if (user != null)
                 {
@@ -70,7 +70,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Commands
 
             questionarioBD.Pergunta = questionario.Pergunta;
             questionarioBD.Resposta = questionario.Resposta;
-            await _dbContext.SaveChangesAsync();
+            _questionarioUsuarioRepository.Update(questionarioBD);
         }
 
         private async Task CriarQuestao(UserLogin user, Questionario questionario)
@@ -83,7 +83,7 @@ namespace DesafioWoop.GestaoSeguranca.API.Commands
                 Resposta = questionario.Resposta
             };
             user.AdicionarQuestionarioUsuario(questionarioUsuario);
-            await _dbContext.SaveChangesAsync();
+            _questionarioUsuarioRepository.Add(questionarioUsuario);
         }        
     }
 }

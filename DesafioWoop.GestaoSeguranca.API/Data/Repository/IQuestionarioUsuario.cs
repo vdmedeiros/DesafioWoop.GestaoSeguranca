@@ -8,9 +8,6 @@ namespace DesafioWoop.GestaoSeguranca.API.Data.Repository
 
         public void Delete(QuestionarioUsuario questionarioUsuario);
 
-        public IEnumerable<QuestionarioUsuario> GetAll();
-
-        public List<QuestionarioUsuario> GetByEmail(string email);
         public QuestionarioUsuario GetById(int id);
 
         public void Update(QuestionarioUsuario questionarioUsuario);

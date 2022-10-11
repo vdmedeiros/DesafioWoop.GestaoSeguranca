@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DesafioWoop.GestaoSeguranca.API.Model
 {
@@ -14,6 +15,9 @@ namespace DesafioWoop.GestaoSeguranca.API.Model
                 
         [Compare("Senha", ErrorMessage = "As senhas não conferem.")]
         public string SenhaConfirmacao { get; set; }
+        
+        [JsonIgnore]
+        public List<QuestionarioUsuario>? QuestionarioUsuarios { get; set; }
 
         public UserLogin ToEntity() => new(Email, Senha);
     }
